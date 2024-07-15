@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/calendrier.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>Agenda</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'calendrier' %}">Calendrier</a></li>
+                <li><a href="{% url 'ajouter_activite' %}">Ajouter une activité</a></li>
+                <li><a href="{% url 'liste_activites' %}">liste des activités</a></li>
+                <li><a href="{% url 'verifier_conflit' %}">Vérifier les conflits</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2024 Agenda</p>
+    </footer>
+</body>
+</html>

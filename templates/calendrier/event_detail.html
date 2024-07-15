@@ -1,0 +1,63 @@
+{% extends 'calendrier/base.html' %}
+
+{% block content %}
+<style>
+    .event-detail {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .event-detail h2 {
+        color: #333;
+        border-bottom: 2px solid #ff9800;
+        padding-bottom: 10px;
+    }
+    .event-detail p {
+        margin-bottom: 10px;
+    }
+    .event-detail strong {
+        color: #ff9800;
+    }
+    .event-detail a {
+        color: #4caf50;
+        text-decoration: none;
+        margin-right: 10px;
+    }
+    .event-detail a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="event-detail">
+    <h2>Détails de l'activité</h2>
+    <p><strong>Nom de l'activité :</strong> {{ activite.activite }}</p>
+    <p><strong>Date de début :</strong> {{ activite.date_debut_formatted }}</p>
+    <p><strong>Date de fin :</strong> {{ activite.date_fin_formatted }}</p>
+    <p><strong>Objet :</strong> {{ activite.object|default:"Non spécifié" }}</p>
+
+    {% if activite.contact %}
+    <p><strong>Contact :</strong> {{ activite.contact }}</p>
+    {% endif %}
+
+    {% if activite.email %}
+    <p><strong>Email :</strong> {{ activite.email }}</p>
+    {% endif %}
+
+    {% if activite.document %}
+    <p><strong>Document :</strong>
+        <a href="?voir_document=1" target="_blank">Consulter le document</a>
+        <a href="{{ activite.document.url }}" download>Télécharger le document</a>
+    </p>
+    {% else %}
+    <p><strong>Document :</strong> Aucun document n'a été téléchargé.</p>
+    {% endif %}
+
+    <p>
+        <a href="?pdf=1" target="_blank">Voir en PDF</a>
+        <a href="?pdf=1&download=1">Télécharger en PDF</a>
+    </p>
+</div>
+{% endblock %}

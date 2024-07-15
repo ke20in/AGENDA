@@ -1,0 +1,32 @@
+{% extends 'calendrier/base.html' %}
+{% block content %}
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/calendrier.css' %}">
+
+<h2>Agenda des activités programmées</h2>
+<div class="calendar-nav">
+    <a class="btn btn-info left" href="{% url 'calendrier' %}?{{ prev_month }}"> Mois précédent </a>
+    <a class="btn btn-info right" href="{% url 'calendrier' %}?{{ next_month }}"> Mois suivant </a>
+</div>
+
+{{ calendar }}
+
+<script>
+    function refreshAtMidnight() {
+        var now = new Date();
+        var night = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate() + 1, // le jour suivant
+            0, 0, 0 // à minuit
+        );
+        var msToMidnight = night.getTime() - now.getTime();
+
+        setTimeout(function() {
+            location.reload();
+        }, msToMidnight);
+    }
+
+    refreshAtMidnight();
+</script>
+{% endblock %}

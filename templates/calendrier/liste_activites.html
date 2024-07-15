@@ -1,0 +1,240 @@
+{% extends 'calendrier/base.html' %}
+{% block content %}
+{% load static %}
+
+<style>
+    :root {
+        --primary-color: #FF9800;
+        --primary-light: #FFB74D;
+        --primary-dark: #F57C00;
+        --background-color: #FFFFFF;
+        --text-color: #212121;
+        --accent-color: #4CAF50;
+        --table-header-bg: #FF9800;
+        --table-header-text: #FFFFFF;
+        --past-activity-color: #FFF3E0;
+        --future-activity-color: #E8F5E9;
+        --current-day-color: #FFB74D;
+        --conflict-color: #FFCDD2;
+        --table-border: #E0E0E0;
+    }
+
+    body {
+        font-family: 'Roboto', Arial, sans-serif;
+        line-height: 1.6;
+        background-color: var(--background-color);
+        color: var(--text-color);
+    }
+
+    h2 {
+        color: var(--primary-dark);
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        background-color: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+    }
+
+    th {
+        background-color: var(--table-header-bg);
+        color: var(--table-header-text);
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    tr.past {
+        background-color: var(--past-activity-color);
+    }
+
+    tr.future {
+        background-color: var(--future-activity-color);
+    }
+
+    tr.today {
+        background-color: var(--current-day-color);
+    }
+
+    tr.conflict {
+        background-color: var(--conflict-color);
+    }
+
+    td {
+        border-bottom: 1px solid var(--table-border);
+    }
+
+        .pagination {
+        margin-top: 30px;
+        text-align: center;
+    }
+
+    .pagination a, .pagination span {
+        display: inline-block;
+        padding: 8px 16px;
+        margin: 0 4px;
+        border: 1px solid var(--primary-color);
+        border-radius: 4px;
+        text-decoration: none;
+        color: var(--primary-color);
+        transition: all 0.3s ease;
+    }
+
+    .pagination a:hover {
+        background-color: var(--primary-color);
+        color: #ffffff;
+    }
+
+    .pagination .active {
+        background-color: var(--primary-color);
+        color: #ffffff;
+    }
+
+    .pagination .disabled {
+        color: #999;
+        cursor: not-allowed;
+    }
+
+    @media screen and (max-width: 600px) {
+        table {
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 10px;
+        }
+    }
+
+        .search-filter {
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .search-filter input, .search-filter select {
+        padding: 8px;
+        border: 1px solid var(--primary-color);
+        border-radius: 4px;
+    }
+
+    .search-filter button {
+        padding: 8px 16px;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .action-links a {
+        color: var(--primary-color);
+        text-decoration: none;
+        margin-right: 10px;
+    }
+
+    .action-links a:hover {
+        text-decoration: underline;
+    }
+
+    .disabled {
+        color: #999;
+        cursor: not-allowed;
+    }
+</style>
+
+<main>
+   <h2>Liste des activités programmées</h2>
+
+    <div class="search-filter">
+        <form method="get" action="{% url 'liste_activites' %}">
+            <input type="text" name="search" placeholder="Rechercher une activité" value="{{ search_query }}">
+            <input type="date" name="date_debut" value="{{ date_debut }}">
+            <input type="date" name="date_fin" value="{{ date_fin }}">
+            <button type="submit">Filtrer</button>
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Activité</th>
+                <th>Date et Heure de Début</th>
+                <th>Date et Heure de Fin</th>
+                <th>Objet</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for activite in activites %}
+            <tr class="
+                {% if activite.date_debut.date < today %}past
+                {% elif activite.date_debut.date == today %}today
+                {% else %}future{% endif %}
+                {% if activite.conflit %}conflict{% endif %}">
+                <td>{{ activite.activite }}</td>
+                <td>{{ activite.date_debut|date:"d/m/Y H:i" }}</td>
+                <td>{{ activite.date_fin|date:"d/m/Y H:i" }}</td>
+                <td>{{ activite.object|default_if_none:"" }}</td>
+                <td class="action-links">
+                    {% if activite.date_debut.date >= today %}
+                        <a href="{% url 'modifier_activite' activite.id %}">Modifier</a>
+                        <a href="{% url 'supprimer_activite' activite.id %}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette activité ?');">Supprimer</a>
+                    {% else %}
+                        <span class="disabled">Modifier</span>
+                        <span class="disabled">Supprimer</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if activites.paginator.num_pages > 1 %}
+    <div class="pagination">
+        {% if activites.has_previous %}
+            <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if date_debut %}&date_debut={{ date_debut }}{% endif %}{% if date_fin %}&date_fin={{ date_fin }}{% endif %}">&laquo; Première</a>
+            <a href="?page={{ activites.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_debut %}&date_debut={{ date_debut }}{% endif %}{% if date_fin %}&date_fin={{ date_fin }}{% endif %}">Précédente</a>
+        {% else %}
+            <span class="disabled">&laquo; Première</span>
+            <span class="disabled">Précédente</span>
+        {% endif %}
+
+        {% for num in activites.paginator.page_range %}
+            {% if activites.number == num %}
+                <span class="active">{{ num }}</span>
+            {% elif num > activites.number|add:'-3' and num < activites.number|add:'3' %}
+                <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_debut %}&date_debut={{ date_debut }}{% endif %}{% if date_fin %}&date_fin={{ date_fin }}{% endif %}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if activites.has_next %}
+            <a href="?page={{ activites.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_debut %}&date_debut={{ date_debut }}{% endif %}{% if date_fin %}&date_fin={{ date_fin }}{% endif %}">Suivante</a>
+            <a href="?page={{ activites.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_debut %}&date_debut={{ date_debut }}{% endif %}{% if date_fin %}&date_fin={{ date_fin }}{% endif %}">Dernière &raquo;</a>
+        {% else %}
+            <span class="disabled">Suivante</span>
+            <span class="disabled">Dernière &raquo;</span>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <p>Page {{ activites.number }} sur {{ activites.paginator.num_pages }}</p>
+</main>
+{% endblock %}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Détails de l'activité</title>
+    <style>
+        @font-face {
+            font-family: 'DejaVu Sans';
+            src: url('https://kendo.cdn.telerik.com/2017.2.621/styles/fonts/DejaVu/DejaVuSans.ttf') format('truetype');
+        }
+        body {
+            font-family: 'DejaVu Sans', Arial, sans-serif;
+        }
+        h1 { color: #ff9800; }
+        .label { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Détails de l'activité</h1>
+    <p><span class="label">Nom de l'activité :</span> {{ activite.activite }}</p>
+    <p><span class="label">Date de début :</span> {{ activite.date_debut }}</p>
+    <p><span class="label">Date de fin :</span> {{ activite.date_fin }}</p>
+    <p><span class="label">Object :</span> {{ activite.object }}</p>
+</body>
+</html>

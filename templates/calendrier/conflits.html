@@ -1,0 +1,67 @@
+{% extends 'calendrier/base.html' %}
+
+{% block content %}
+<style>
+    .conflit {
+        color: red;
+        font-weight: bold;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
+
+<h2>Recherche de créneaux disponibles</h2>
+<form method="get">
+    <label for="date_recherche">Date :</label>
+    <input type="date" id="date_recherche" name="date_recherche" value="{{ date_recherche }}" required>
+
+    <label for="heure_recherche">Heure de début :</label>
+    <input type="time" id="heure_recherche" name="heure_recherche" value="{{ heure_recherche }}" required>
+
+    <label for="duree">Durée (minutes) :</label>
+    <input type="number" id="duree" name="duree" value="{{ duree }}" min="15" step="15" required>
+
+    <button type="submit">Rechercher</button>
+</form>
+
+{% if conflits %}
+    <h3>Conflits horaires détectés :</h3>
+    <ul>
+    {% for conflit in conflits %}
+        <li class="conflit">{{ conflit.activite }} ({{ conflit.date_debut|date:"d/m/Y H:i" }} - {{ conflit.date_fin|date:"H:i" }})</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+{% if creneaux_disponibles %}
+    <h3>Créneaux disponibles (entre 8h et 18h) :</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Début</th>
+                <th>Fin</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for debut, fin in creneaux_disponibles %}
+            <tr>
+                <td>{{ debut|date:"d/m/Y H:i" }}</td>
+                <td>{{ fin|date:"H:i" }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% elif date_recherche and heure_recherche %}
+    <p>Aucun créneau disponible trouvé pour la période spécifiée entre 8h et 18h.</p>
+{% endif %}
+{% endblock %}
